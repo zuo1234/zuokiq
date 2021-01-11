@@ -1,0 +1,6 @@
+
+
+gem "zuokiq", :path => '../..'
+gem "redis"
+gem "pry"
+gem "pry-rails"
