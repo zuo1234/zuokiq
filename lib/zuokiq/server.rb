@@ -10,22 +10,18 @@ module Zuokiq
     def start
       Zuokiq.logger.info "start zuokiq"
       ractor_worker
+      # handle_thread_jobs
 
       loop do
         _, job_json = RedisClient.current.blpop(*queues_map(queues), 0)
-
-        # Zuokiq.logger.info "[zuokiq][#{self.name}][]"
-        job = JSON.parse(job_json)
-        Zuokiq.logger.info "[zuokiq][#{self.name}][]"
+        
+        job = Zuokiq::Job.factory(job_json)
+        job.performing
 
         pipe << job
       end
     rescue Interrupt
       Zuokiq.logger.info 'Bye!'
-    end
-
-    def stop
-      
     end
 
     private
@@ -34,11 +30,25 @@ module Zuokiq
       @ractor_workers ||= (1..concurrency).map do
         Ractor.new(pipe) do |pipe|
           while job = pipe.take
-            Ractor.yield Processor.new(job).run
+            Ractor.yield job.run
           end
         end
       end
     end
+
+    # def handle_thread_jobs
+    #   semaphore = Mutex.new
+    #   counter = 0
+    #   Thread.new do
+    #     while counter < concurrency && job = pipe.take
+    #       semaphore.synchronize { counter += 1 }
+    #       Thread.new do
+    #         job.run
+    #         semaphore.synchronize { counter -= 1 }
+    #       end
+    #     end
+    #   end
+    # end
 
     def queues_map(queues)
       queues.map{|q| "zuokiq:#{q}" }

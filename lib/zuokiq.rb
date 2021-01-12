@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 require "json"
 require "redis"
+require 'securerandom'
 require_relative "zuokiq/config"
+require_relative "zuokiq/job"
 require_relative "zuokiq/logger"
 require_relative "zuokiq/processor"
 require_relative "zuokiq/redis_client"
@@ -17,6 +19,6 @@ module Zuokiq
   end
 
   def self.logger
-    @logger ||= Logger.new($stdout)
+    Logger::LOGGER
   end
 end

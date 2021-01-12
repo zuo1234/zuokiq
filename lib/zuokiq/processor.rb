@@ -2,10 +2,9 @@ module Zuokiq
   class Processor
     attr_accessor :klass, :data
 
-    # job {klass: "", data: [""..]}
-    def initialize(job)
-      @klass = Object.const_get(job["klass"])
-      @data = job["data"]
+    def initialize(klass, data)
+      @klass = Object.const_get(klass)
+      @data = data
     end
 
     def run

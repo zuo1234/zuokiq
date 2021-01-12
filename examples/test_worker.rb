@@ -11,7 +11,7 @@ class TestWorker
 
   queue_as :default
 
-  def perform(data)
-    p data
+  def perform(name)
+    p "hello #{name}"
   end  
 end

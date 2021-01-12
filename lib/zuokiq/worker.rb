@@ -10,7 +10,8 @@ module Zuokiq
 
       def perform_async(data)
         queue_name = self.queue || "default"
-        RedisClient.current.rpush("zuokiq:#{queue_name}", {'klass' => self.name, 'data' => data}.to_json)
+        job = Zuokiq::Job.new(self.name, data)
+        job.enqueue(queue_name)
       end
 
       def queue_as(queue_name)
